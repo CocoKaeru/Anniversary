@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Guess the Location Game</title>
+
+<!-- Your original fonts and styles -->
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap");
+
+  /* Your original background and body styles */
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Press Start 2P', cursive;
+    background: url('assets/cocobackground.png') no-repeat center top fixed;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: rgb(244, 244, 244);
+    color: white;
+  }
+
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    width: 35%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -2;
+  }
+
+  body::before {
+    left: 0;
+    background-image: url('assets/tree.png');
+    background-position: right center;
+  }
+
+  body::after {
+    right: 0;
+    background-image: url('assets/flowers2.png');
+    background-position: left center;
+  }
+
+  .container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding-bottom: 80px; /* leave space for nav-bar */
+  }
+
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    width: 460px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 10px 0;
+    z-index: 10;
+  }
+
+  .nav-bar a {
+    color: white;
+    font-size: 14px;
+    text-decoration: none;
+    font-family: 'Press Start 2P', cursive;
+    text-shadow: 1px 1px #000;
+    transition: color 0.3s;
+  }
+
+  .nav-bar a:hover {
+    color: #ffd700;
+  }
+
+  #ramen {
+    position: fixed;
+    width: 60px;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    transition: transform 0.3s ease-out;
+    z-index: 99;
+    pointer-events: none;
+  }
+
+  /* === New styles for the guess game === */
+
+  #guess-game {
+    position: relative;
+    z-index: 20; /* above nav and backgrounds */
+    max-width: 500px;
+    margin: 50px auto 100px; /* some spacing */
+    padding: 20px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 12px;
+    box-shadow: 0 0 15px #ff99cc;
+    font-family: Arial, sans-serif;
+    color: white;
+  }
+
+  #guess-game h1 {
+    font-family: 'Press Start 2P', cursive;
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 5px black;
+  }
+
+  #image-container {
+    width: 400px;
+    height: 300px;
+    margin: 0 auto 20px;
+    overflow: hidden;
+    border-radius: 12px;
+    position: relative;
+    background: #000;
+    cursor: pointer;
+    transition: transform 1s ease;
+  }
+
+  #zoomed-image {
+    width: 1200px; /* bigger zoom */
+    height: 950px;
+    object-fit: cover;
+    position: absolute;
+    top: -150px; /* adjust to keep inside */
+    left: -200px;
+    transition: all 1s ease;
+  }
+
+  #guess-input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 3px solid #555;
+    width: 280px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  #guess-input.wrong {
+    border-color: red;
+    animation: flash-red 0.5s ease;
+  }
+
+  @keyframes flash-red {
+    0%, 100% { border-color: red; }
+    50% { border-color: #555; }
+  }
+
+  #submit-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    background: #28a745;
+    color: white;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  #submit-btn:hover {
+    background: #218838;
+  }
+
+  #skip-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    background: #dc3545;
+    color: white;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  /* Message display */
+  #message {
+    font-size: 14px;
+    height: 24px;
+    margin-top: 15px;
+    font-family: 'Press Start 2P', cursive;
+    color: #00ffe5;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  #message.show {
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Guess the Location Game -->
+  <div id="guess-game">
+    <h1>Where have we been together?</h1>
+    <div id="image-container">
+      <img id="zoomed-image" src="assets/20230814_181322.jpg" alt="Zoomed Location" />
+    </div>
+    <input type="text" id="guess-input" placeholder="Type your answer in English or Japanese" />
+    <button id="submit-btn">Guess</button>
+    <button id="skip-btn">Skip</button>   
+    <div id="message"></div>
+  </div>
+
+  <!-- Your original onigiri and nav-bar -->
+  <img src="assets/ramen.png" id="ramen" alt="Ramen" />
+
+  <div class="nav-bar">
+    <a href="index.html">Home</a>
+    <a href="memories.html">Memories</a>
+    <a href="letter.html">Letter</a>
+  </div>
+
+</div>
+
+<script>
+const zoomedImage = document.getElementById('zoomed-image');
+const guessInput = document.getElementById('guess-input');
+const submitBtn = document.getElementById('submit-btn');
+const skipBtn = document.getElementById('skip-btn');
+const message = document.getElementById('message');
+
+const zoomPositions = [
+  { top: '-150px', left: '-200px' }, // center-ish zoom-in
+  { top: '0px', left: '0px' },       // top-left corner
+  { top: '0px', left: '-400px' },    // top-right corner
+  { top: '-300px', left: '0px' },    // bottom-left corner
+  { top: '-300px', left: '-400px' }  // bottom-right corner
+];
+
+function setRandomZoomPosition() {
+  const pos = zoomPositions[Math.floor(Math.random() * zoomPositions.length)];
+  zoomedImage.style.top = pos.top;
+  zoomedImage.style.left = pos.left;
+  zoomedImage.style.width = '1000px';  // bigger zoom
+  zoomedImage.style.height = '750px';
+}
+
+const images = [
+  { src: 'assets/20230814_181322.jpg', answers: ['Brighton', 'ブライトン'] },
+  { src: 'assets/20230815_115205.jpg', answers: ['Brighton', 'ブライトン'] },
+  { src: 'assets/20230821_200946.jpg', answers: ['Stratford', 'ストラットフォード'] },
+  { src: 'assets/20230917_153342.jpg', answers: ['Carols House', 'キャロルの家'] },
+  { src: 'assets/20231203_205903.jpg', answers: ['Brussels', 'ブリュッセル'] },
+  { src: 'assets/20231203_211043.jpg', answers: ['Brussels', 'ブリュッセル'] },
+  { src: 'assets/20231206_145728.jpg', answers: ['Berlin', 'ベルリン'] },
+  { src: 'assets/IMG-20231205-WA0287.jpg', answers: ['Berlin Wall', 'ベルリンの壁'] },
+  { src: 'assets/20231225_153930.jpg', answers: ['Chester', 'チェスター'] },
+  { src: 'assets/IMG-20250416-WA0568.jpg', answers: ['Sapporo', '札幌'] },
+  { src: 'assets/IMG-20250416-WA0496.jpg', answers: ['Sapporo', '札幌'] },
+  { src: 'assets/IMG-20250416-WA0347.jpg', answers: ['白金青い池'] },
+  { src: 'assets/IMG-20250416-WA0311.jpg', answers: ['Biei', '美瑛'] },
+  { src: 'assets/IMG-20250416-WA0265.jpg', answers: ['Biei', '美瑛'] },
+  { src: 'assets/20250315_122146.jpg', answers: ['Sapporo', '札幌'] },
+  { src: 'assets/20250310_155753.jpg', answers: ['Otaru', '小樽'] },
+  { src: 'assets/20250312_164426.jpg', answers: ['Lake Biwa', '琵琶湖'] },
+  { src: 'assets/20250309_094912.jpg', answers: ['Biei', '美瑛'] },
+  { src: 'assets/20250308_133538.jpg', answers: ['Asahikawa Zoo', '旭川市の動物園'] },
+  { src: 'assets/20241103_162458.jpg', answers: ['Beppu', '別府'] },
+  { src: 'assets/IMG-20241102-WA0258.jpg', answers: ['Tokyo', '東京'] },
+  { src: 'assets/IMG-20241102-WA0235.jpg', answers: ['Sado Island', '佐渡島'] },
+  { src: 'assets/IMG-20241102-WA0204.jpg', answers: ['Sado Island', '佐渡島'] },
+  { src: 'assets/IMG-20241102-WA0055.jpg', answers: ['Ootsu', '大津'] },
+  { src: 'assets/IMG-20241102-WA0010.jpg', answers: ['Shanghai Airport', '上海浦東国際空港'] },
+  { src: 'assets/IMG-20241102-WA0250.jpg', answers: ['Welcia Sado Island', 'welcia 佐渡島'] },
+  { src: 'assets/IMG-20241102-WA0169.jpg', answers: ['Sado Island', '佐渡島'] },
+  { src: 'assets/20241101_124832_001.jpg', answers: ['Ooita Shinyabakei', '大分深耶馬渓'] },
+  { src: 'assets/20241026_135459.jpg', answers: ['Kanazawa', '金沢'] },
+  { src: 'assets/IMG-20241001-WA0070.jpg', answers: ['Barcelona', 'バルセロナ'] },
+  { src: 'assets/20240929_171140.jpg', answers: ['Gongs house', 'ゴングの家'] },
+  { src: 'assets/20240927_033107.jpg', answers: ['Barcelona', 'バルセロナ'] },
+  { src: 'assets/20240822_192932.jpg', answers: ['Santorini', 'サントリーニ島'] },
+  { src: 'assets/20240821_184917.jpg', answers: ['Tinos', 'ティノス'] },
+  { src: 'assets/20240818_094044.jpg', answers: ['Wembley', 'ウェンブリー'] },
+  { src: 'assets/20240605_211025.jpg', answers: ['Rome', 'ローマ'] },
+  { src: 'assets/20240604_160640.jpg', answers: ['Eze'] },
+  { src: 'assets/20240601_222544.jpg', answers: ['Fumi-sans House', 'ふみさんの家'] },
+  { src: 'assets/IMG-20240530-WA0035.jpg', answers: ['Beppu', '別府'] }
+];
+
+// Shuffle images array before starting game
+shuffleArray(images);
+
+let currentImageIndex = 0;
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function loadImage(index) {
+  const imageData = images[index];
+  zoomedImage.src = imageData.src;
+  setRandomZoomPosition();
+  guessInput.disabled = false;
+  submitBtn.disabled = false;
+  guessInput.value = '';
+  guessInput.focus();
+  clearMessage();
+}
+
+function moveToNextImage() {
+  currentImageIndex++;
+  if (currentImageIndex >= images.length) {
+    showMessage("You've completed all images! Starting over.");
+    currentImageIndex = 0;
+    setTimeout(() => {
+      loadImage(currentImageIndex);
+    }, 2000);
+  } else {
+    loadImage(currentImageIndex);
+  }
+}
+
+function normalizeAnswer(answer) {
+  return answer.trim().toLowerCase();
+}
+
+function showMessage(text) {
+  message.textContent = text;
+  message.classList.add('show');
+  // Remove after 1.5 seconds
+  setTimeout(() => {
+    message.classList.remove('show');
+    message.textContent = '';
+  }, 1500);
+}
+
+function clearMessage() {
+  message.classList.remove('show');
+  message.textContent = '';
+}
+
+submitBtn.addEventListener('click', () => {
+  const userAnswer = normalizeAnswer(guessInput.value);
+  if (!userAnswer) {
+    guessInput.classList.add('wrong');
+    setTimeout(() => guessInput.classList.remove('wrong'), 500);
+    return;
+  }
+
+  const correctAnswers = images[currentImageIndex].answers.map(normalizeAnswer);
+  if (correctAnswers.includes(userAnswer)) {
+    guessInput.disabled = true;
+    submitBtn.disabled = true;
+    showMessage('Correct! Moving to the next image.');
+    setTimeout(() => {
+      moveToNextImage();
+    }, 1500);
+  } else {
+    guessInput.classList.add('wrong');
+    setTimeout(() => guessInput.classList.remove('wrong'), 500);
+  }
+});
+
+skipBtn.addEventListener('click', () => {
+  const correctAnswer = images[currentImageIndex].answers[0];
+  guessInput.disabled = true;
+  submitBtn.disabled = true;
+  showMessage(`Skipped! The correct answer was: ${correctAnswer}`);
+  setTimeout(() => {
+    moveToNextImage();
+  }, 1500);
+});
+
+// Load first image on start
+loadImage(currentImageIndex);
+
+
+const ramen = document.getElementById('ramen');
+const navLinks = document.querySelectorAll('.nav-bar a');
+
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault(); // prevent immediate navigation
+
+    // Animate ramen pop-up
+    ramen.style.transform = 'translateX(-50%) scale(1)';
+
+    setTimeout(() => {
+      ramen.style.transform = 'translateX(-50%) scale(0)';
+    }, 800); // hide after 800ms
+
+    // Navigate after delay
+    const targetHref = link.getAttribute('href');
+    setTimeout(() => {
+      window.location.href = targetHref;
+    }, 900);
+  });
+});
+
+</script>
+
+</body>
+</html>

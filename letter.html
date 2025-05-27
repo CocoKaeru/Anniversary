@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Letter To My Sweet Watermelon</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="message"></h1>
+
+    <div class="letter-box">
+    <p>
+        愛しいスイカちゃんへ,  
+        <br><br>
+        私たちには、何か特別で不思議な力がある気がするんだ。ただの偶然や運命以上のもの。宇宙が私たちを出会わせるために、時を超えて道を編み込んでくれたんだと思う。そして、心のすべてで信じてる。私たちを結びつけたその力が、これからもずっと、どんな時代でも、どんな姿でも、私たちを結び続けてくれるって。
+        どれだけ距離が離れていても、その一歩一歩が僕の心に教えてくれるのは、たった一つの真実。美沙季こそが、僕の帰る場所なんだと。世界のどこにいても、それは変わらない。遅い夜も、乗り越えるべき試練も、前に進むすべての歩みも、すべては美沙季との未来のため。私たちが一緒に築いていく、あたたかくて美しい未来のため。美沙季が僕の人生に与えてくれる喜びは、言葉にできないほど大きいよ。どんな普通の瞬間も宝物に変えてくれる力が美沙季にはある。画面越しでも、笑いすぎてお腹が痛くなるほど笑わせてくれるんだ。美沙季の幸せが僕の幸せになって、美沙季の夢が僕の夢になって、美沙季の愛が、僕がこれから築いていくすべての土台になるんだよ。
+        美沙季の笑い声も、夢も、ちょっとした癖も、
+        そしてまだ起きてもいないことを心配する君の姿さえも、全部が愛おしい。
+        嬉しい時の美沙季も、そうじゃない時に僕を頼ってくれる美沙季も、どちらの美沙季も心から愛してる。
+        この距離は一時的なもの。でも、私たちの絆は永遠。離れている一日一日が、美沙季と永遠に一緒になれるその日へのカウントダウン。その思いが、どんな辛い瞬間も乗り越えさせてくれるんだ。
+        僕の人でいてくれてありがとう。僕の安らぎであり、最高の冒険でいてくれてありがとう。
+        離れていても変わらぬ愛を注いでくれて、こんなに特別な愛を信じさせてくれて、本当にありがとう。
+
+        また美沙季を抱きしめられるその日まで、
+        僕の心も、鼓動も、夢も、いつだって君と共にあるよ。
+        永遠に、いつでも、どこでも心からの愛を込めて。
+        <br><br>
+        イーサン
+    </p>
+    </div>
+    
+
+    <audio id="bg-music" autoplay loop>
+        <source src="assets/hikaruutadaFL.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+
+    <img src="assets/onigiriemoji.png" id="onigiri" alt="Onigiri">
+
+    <div class="nav-bar">
+      <a href="index.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="memories.html">Memories</a>
+    </div>
+  </div>
+
+  <script>
+    const navLinks = document.querySelectorAll('.nav-bar a');
+    const onigiri = document.getElementById('onigiri');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        onigiri.style.transform = 'translateX(-50%) scale(1)';
+        setTimeout(() => {
+          onigiri.style.transform = 'translateX(-50%) scale(0)';
+          window.location.href = link.href;
+        }, 400);
+      });
+    });
+  </script>
+</body>
+</html>
