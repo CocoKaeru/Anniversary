@@ -267,7 +267,6 @@ const images = [
   { src: 'assets/20250310_155753.jpg', answers: ['Otaru', '小樽'] },
   { src: 'assets/20250312_164426.jpg', answers: ['Lake Biwa', '琵琶湖'] },
   { src: 'assets/20250309_094912.jpg', answers: ['Biei', '美瑛'] },
-  { src: 'assets/20250308_133538.jpg', answers: ['Asahikawa Zoo', '旭川市の動物園'] },
   { src: 'assets/20241103_162458.jpg', answers: ['Beppu', '別府'] },
   { src: 'assets/IMG-20241102-WA0258.jpg', answers: ['Tokyo', '東京'] },
   { src: 'assets/IMG-20241102-WA0235.jpg', answers: ['Sado Island', '佐渡島'] },
@@ -282,7 +281,7 @@ const images = [
   { src: 'assets/20240929_171140.jpg', answers: ['Gongs house', 'ゴングの家'] },
   { src: 'assets/20240927_033107.jpg', answers: ['Barcelona', 'バルセロナ'] },
   { src: 'assets/20240822_192932.jpg', answers: ['Santorini', 'サントリーニ島'] },
-  { src: 'assets/20240821_184917.jpg', answers: ['Tinos', 'ティノス'] },
+  { src: 'assets/20240821_201855.jpg', answers: ['Tinos', 'ティノス'] },
   { src: 'assets/20240818_094044.jpg', answers: ['Wembley', 'ウェンブリー'] },
   { src: 'assets/20240605_211025.jpg', answers: ['Rome', 'ローマ'] },
   { src: 'assets/20240604_160640.jpg', answers: ['Eze'] },
@@ -291,9 +290,10 @@ const images = [
 ];
 
 // Shuffle images array before starting game
-shuffleArray(images);
 
-let currentImageIndex = 0;
+
+let remainingImages = [...images];
+shuffleArray(remainingImages);
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -302,9 +302,9 @@ function shuffleArray(array) {
   }
 }
 
-function loadImage(index) {
-  const imageData = images[index];
+function loadImage(imageData) {
   zoomedImage.src = imageData.src;
+  zoomedImage.dataset.answers = JSON.stringify(imageData.answers);
   setRandomZoomPosition();
   guessInput.disabled = false;
   submitBtn.disabled = false;
@@ -313,18 +313,23 @@ function loadImage(index) {
   clearMessage();
 }
 
+
 function moveToNextImage() {
-  currentImageIndex++;
-  if (currentImageIndex >= images.length) {
+  console.log('Remaining images:', remainingImages.length);
+  if (remainingImages.length === 0) {
     showMessage("You've completed all images! Starting over.");
-    currentImageIndex = 0;
+    remainingImages = [...images];
+    shuffleArray(remainingImages);
     setTimeout(() => {
-      loadImage(currentImageIndex);
+      loadImage(remainingImages.pop());
+      console.log('Restarting images:', remainingImages.length);
     }, 2000);
   } else {
-    loadImage(currentImageIndex);
+    loadImage(remainingImages.pop());
   }
 }
+
+console.log('Total images:', images.length);
 
 function normalizeAnswer(answer) {
   return answer.trim().toLowerCase();
@@ -353,17 +358,19 @@ submitBtn.addEventListener('click', () => {
     return;
   }
 
-  const correctAnswers = images[currentImageIndex].answers.map(normalizeAnswer);
+  const correctAnswers  = JSON.parse(zoomedImage.dataset.answers).map(normalizeAnswer);
 if (correctAnswers.includes(userAnswer)) {
   guessInput.disabled = true;
   submitBtn.disabled = true;
   showMessage('Correct!');
 
   // Zoom OUT to show full image
-  zoomedImage.style.top = '0px';
-  zoomedImage.style.left = '0px';
-  zoomedImage.style.width = '400px';  // match cont ainer size
-  zoomedImage.style.height = '300px';
+  // Zoom OUT to show full image (slightly more zoomed out)
+  zoomedImage.style.top = '-20px';
+  zoomedImage.style.left = '-30px';
+  zoomedImage.style.width = '460px';
+  zoomedImage.style.height = '340px';
+
 
   // Wait 1.5s for zoom out, then move to next image
   setTimeout(() => {
@@ -376,16 +383,20 @@ if (correctAnswers.includes(userAnswer)) {
 });
 
 skipBtn.addEventListener('click', () => {
-  const correctAnswer = images[currentImageIndex].answers[0];
+  const correctAnswers = JSON.parse(zoomedImage.dataset.answers).map(normalizeAnswer);
   guessInput.disabled = true;
   submitBtn.disabled = true;
-  showMessage(`Skipped! The correct answer was: ${correctAnswer}`);
+  // Show first correct answer (not normalized, to display nicely)
+const originalAnswers = JSON.parse(zoomedImage.dataset.answers);
+showMessage(`Skipped! The correct answer was: ${originalAnswers[0]}`);
 
-  // Zoom OUT to show full image
-  zoomedImage.style.top = '0px';
-  zoomedImage.style.left = '0px';
-  zoomedImage.style.width = '400px';
-  zoomedImage.style.height = '300px';
+
+// Zoom OUT to show full image (slightly more zoomed out)
+zoomedImage.style.top = '-40px';
+zoomedImage.style.left = '-50px';
+zoomedImage.style.width = '460px';
+zoomedImage.style.height = '340px';
+
 
   // Wait for zoom-out animation, then move to next image
   setTimeout(() => {
@@ -395,7 +406,8 @@ skipBtn.addEventListener('click', () => {
 
 
 // Load first image on start
-loadImage(currentImageIndex);
+loadImage(remainingImages.pop());
+
 
 
 const ramen = document.getElementById('ramen');
