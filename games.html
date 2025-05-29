@@ -354,13 +354,21 @@ submitBtn.addEventListener('click', () => {
   }
 
   const correctAnswers = images[currentImageIndex].answers.map(normalizeAnswer);
-  if (correctAnswers.includes(userAnswer)) {
-    guessInput.disabled = true;
-    submitBtn.disabled = true;
-    showMessage('Correct! Moving to the next image.');
-    setTimeout(() => {
-      moveToNextImage();
-    }, 1500);
+if (correctAnswers.includes(userAnswer)) {
+  guessInput.disabled = true;
+  submitBtn.disabled = true;
+  showMessage('Correct!');
+
+  // Zoom OUT to show full image
+  zoomedImage.style.top = '0px';
+  zoomedImage.style.left = '0px';
+  zoomedImage.style.width = '400px';  // match cont ainer size
+  zoomedImage.style.height = '300px';
+
+  // Wait 1.5s for zoom out, then move to next image
+  setTimeout(() => {
+    moveToNextImage();
+  }, 1500);
   } else {
     guessInput.classList.add('wrong');
     setTimeout(() => guessInput.classList.remove('wrong'), 500);
@@ -372,10 +380,19 @@ skipBtn.addEventListener('click', () => {
   guessInput.disabled = true;
   submitBtn.disabled = true;
   showMessage(`Skipped! The correct answer was: ${correctAnswer}`);
+
+  // Zoom OUT to show full image
+  zoomedImage.style.top = '0px';
+  zoomedImage.style.left = '0px';
+  zoomedImage.style.width = '400px';
+  zoomedImage.style.height = '300px';
+
+  // Wait for zoom-out animation, then move to next image
   setTimeout(() => {
     moveToNextImage();
   }, 1500);
 });
+
 
 // Load first image on start
 loadImage(currentImageIndex);
